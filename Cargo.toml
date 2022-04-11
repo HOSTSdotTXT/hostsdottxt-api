@@ -1,0 +1,29 @@
+[package]
+name = "fdns-api"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.56"
+axum = "0.5.1"
+bcrypt = "0.12.1"
+chrono = { version = "0.4.19", features = ["serde"] }
+dotenvy = "0.15.1"
+lazy_static = "1.4.0"
+log = "0.4.16"
+mime = "0.3.16"
+#powerdns = "0.1.1"
+powerdns = { path = "../powerdns/" }
+rand = "0.8.5"
+serde = { version = "1.0.136", features = ["derive"] }
+serde_json = "1.0.79"
+sqlx = { version = "0.5.11", features = ["postgres", "runtime-tokio-rustls", "chrono"] }
+tokio = { version = "1.17.0", features = ["full"] }
+totp-rs = "0.7.4"
+tower = "0.4.12"
+tower-http = { version = "0.2.5", features = ["cors", "trace"] }
+tracing-subscriber = "0.3.10"
+
+[features]
