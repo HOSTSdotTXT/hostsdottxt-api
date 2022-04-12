@@ -49,7 +49,8 @@ async fn main() {
                     "/users",
                     Router::new()
                         .route("/", post(routes::v1::users::create_user))
-                        .route("/all", get(routes::v1::users::get_all_users)),
+                        .route("/all", get(routes::v1::users::get_all_users))
+                        .route("/totp", get(routes::v1::users::needs_totp)),
                 ),
             ),
         )
