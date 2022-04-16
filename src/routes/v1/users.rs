@@ -1,11 +1,10 @@
 use crate::db;
-use crate::extractors;
+use crate::extractors::{Json, Jwt};
 use crate::routes::v1::requests;
 use axum::extract::Query;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Extension;
-use extractors::Json;
 use hmac::{Hmac, Mac};
 use jwt::SignWithKey;
 use lazy_static::lazy_static;
@@ -53,6 +52,10 @@ pub async fn get_all_users(Extension(pool): Extension<Arc<Pool<Postgres>>>) -> i
             Json(json!({"error": err.to_string()})),
         ),
     }
+}
+
+pub async fn whoami(Jwt(user): Jwt) -> impl IntoResponse {
+    (StatusCode::OK, Json(json!(user)))
 }
 
 pub async fn needs_totp(
