@@ -1,7 +1,7 @@
 CREATE extension IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE users (
-  id varchar(64) PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   email varchar(255) NOT NULL UNIQUE,
   password varchar(255) NOT NULL,
   display_name varchar(255),
@@ -16,7 +16,7 @@ CREATE TABLE zones (
   id varchar(255) NOT NULL UNIQUE PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
   modified_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
-  owner_uuid varchar(64) NOT NULL,
+  owner_uuid uuid NOT NULL,
   constraint owner_uuid_fk foreign key (owner_uuid) references users (id)
 );
 

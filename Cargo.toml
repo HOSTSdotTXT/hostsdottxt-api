@@ -22,11 +22,12 @@ rand = "0.8.5"
 serde = { version = "1.0.136", features = ["derive"] }
 serde_json = "1.0.79"
 sha2 = "0.10.2"
-sqlx = { version = "0.5.11", features = ["postgres", "runtime-tokio-rustls", "chrono"] }
+sqlx = { version = "0.5.13", features = ["postgres", "runtime-tokio-rustls", "chrono", "uuid"] }
 tokio = { version = "1.17.0", features = ["full"] }
 totp-rs = "0.7.4"
 tower = "0.4.12"
 tower-http = { version = "0.2.5", features = ["cors", "trace"] }
 tracing-subscriber = "0.3.11"
+uuid = { version = "0.8.2", features = ["serde", "v4"] }
 
 [features]

@@ -11,8 +11,7 @@ use lazy_static::lazy_static;
 use serde_json::json;
 use sha2::Sha256;
 use sqlx::{Error, Pool, Postgres};
-use std::collections::BTreeMap;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::env;
 use std::sync::Arc;
 
@@ -122,10 +121,11 @@ pub async fn login(
         .to_string();
     let dn = user.display_name.unwrap_or_else(|| "".to_string());
     let admin = user.admin.to_string();
+    let sub = user.id.to_string();
 
     // https://www.iana.org/assignments/jwt/jwt.xhtml
     claims.insert("iss", "fdns");
-    claims.insert("sub", &user.id);
+    claims.insert("sub", &sub);
     claims.insert("iat", &iat);
     claims.insert("exp", &exp);
     claims.insert("dn", &dn);
