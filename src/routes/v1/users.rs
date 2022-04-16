@@ -6,10 +6,20 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Extension;
 use extractors::Json;
+use hmac::{Hmac, Mac};
+use jwt::SignWithKey;
+use lazy_static::lazy_static;
 use serde_json::json;
+use sha2::Sha256;
 use sqlx::{Error, Pool, Postgres};
+use std::collections::BTreeMap;
 use std::collections::HashMap;
+use std::env;
 use std::sync::Arc;
+
+lazy_static! {
+    static ref JWT_SECRET: String = env::var("JWT_SECRET").unwrap();
+}
 
 pub async fn create_user(
     Json(signup): Json<requests::Signup>,
@@ -62,4 +72,63 @@ pub async fn needs_totp(
             Json(json!({"error": "Missing query parameter `email`"})),
         ),
     }
+}
+
+pub async fn login(
+    Json(login_req): Json<requests::Login>,
+    Extension(pool): Extension<Arc<Pool<Postgres>>>,
+) -> impl IntoResponse {
+    let user = db::users::get_user(&pool, &login_req.email).await;
+    let user = match user {
+        Ok(user) => user,
+        Err(err) => match err {
+            Error::RowNotFound => {
+                return (
+                    StatusCode::UNAUTHORIZED,
+                    Json(json!({"error": "Invalid email or password"})),
+                );
+            }
+            _ => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(json!({ "error": format!("{:?}", err) })),
+                )
+            }
+        },
+    };
+
+    if !bcrypt::verify(&login_req.password, &user.password).unwrap_or(false) {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({"error": "Invalid email or password"})),
+        );
+    }
+    if !user.enabled {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({"error": "Invalid email or password"})),
+        );
+    }
+
+    let key: Hmac<Sha256> = Hmac::new_from_slice((*JWT_SECRET).as_bytes()).unwrap();
+    let mut claims = BTreeMap::new();
+
+    let iat = chrono::Utc::now().timestamp().to_string();
+    let exp = (chrono::Utc::now() + chrono::Duration::hours(24))
+        .timestamp()
+        .to_string();
+    let dn = user.display_name.unwrap_or_else(|| "".to_string());
+    let admin = user.admin.to_string();
+
+    // https://www.iana.org/assignments/jwt/jwt.xhtml
+    claims.insert("iss", "fdns");
+    claims.insert("sub", &user.email);
+    claims.insert("iat", &iat);
+    claims.insert("exp", &exp);
+    claims.insert("dn", &dn);
+    claims.insert("email", &user.email);
+    claims.insert("admin", &admin);
+
+    let token = claims.sign_with_key(&key).unwrap();
+    (StatusCode::OK, Json(json!({ "token": token })))
 }

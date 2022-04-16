@@ -11,6 +11,8 @@ axum = "0.5.1"
 bcrypt = "0.12.1"
 chrono = { version = "0.4.19", features = ["serde"] }
 dotenvy = "0.15.1"
+hmac = "0.12.1"
+jwt = "0.16.0"
 lazy_static = "1.4.0"
 log = "0.4.16"
 mime = "0.3.16"
@@ -19,11 +21,12 @@ powerdns = { path = "../powerdns/" }
 rand = "0.8.5"
 serde = { version = "1.0.136", features = ["derive"] }
 serde_json = "1.0.79"
+sha2 = "0.10.2"
 sqlx = { version = "0.5.11", features = ["postgres", "runtime-tokio-rustls", "chrono"] }
 tokio = { version = "1.17.0", features = ["full"] }
 totp-rs = "0.7.4"
 tower = "0.4.12"
 tower-http = { version = "0.2.5", features = ["cors", "trace"] }
-tracing-subscriber = "0.3.10"
+tracing-subscriber = "0.3.11"
 
 [features]
