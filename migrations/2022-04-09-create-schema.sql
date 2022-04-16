@@ -1,5 +1,8 @@
+CREATE extension IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE users (
-  email varchar(255) NOT NULL UNIQUE PRIMARY KEY,
+  id varchar(64) PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email varchar(255) NOT NULL UNIQUE,
   password varchar(255) NOT NULL,
   display_name varchar(255),
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
@@ -13,8 +16,8 @@ CREATE TABLE zones (
   id varchar(255) NOT NULL UNIQUE PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
   modified_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
-  owner_email varchar(255) NOT NULL,
-  CONSTRAINT owner_email_fk FOREIGN KEY (owner_email) REFERENCES users (email) ON DELETE CASCADE
+  owner_uuid varchar(64) NOT NULL,
+  constraint owner_uuid_fk foreign key (owner_uuid) references users (id)
 );
 
 CREATE OR REPLACE FUNCTION update_modified_column()

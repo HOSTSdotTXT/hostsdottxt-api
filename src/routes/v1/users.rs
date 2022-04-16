@@ -125,7 +125,7 @@ pub async fn login(
 
     // https://www.iana.org/assignments/jwt/jwt.xhtml
     claims.insert("iss", "fdns");
-    claims.insert("sub", &user.email);
+    claims.insert("sub", &user.id);
     claims.insert("iat", &iat);
     claims.insert("exp", &exp);
     claims.insert("dn", &dn);

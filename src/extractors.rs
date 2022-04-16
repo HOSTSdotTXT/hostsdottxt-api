@@ -59,7 +59,12 @@ where
                 let token = header.replace("Bearer ", "");
                 let claims: BTreeMap<String, String> = match token.verify_with_key(&key) {
                     Ok(claims) => claims,
-                    Err(_) => return Err((StatusCode::UNAUTHORIZED, axum::Json(json!({ "error": "Invalid token" })))),
+                    Err(_) => {
+                        return Err((
+                            StatusCode::UNAUTHORIZED,
+                            axum::Json(json!({ "error": "Invalid token" })),
+                        ))
+                    }
                 };
 
                 let token = Token {
