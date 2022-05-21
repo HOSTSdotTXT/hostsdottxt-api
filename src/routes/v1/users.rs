@@ -49,7 +49,10 @@ pub async fn create_user(
     }
 }
 
-pub async fn get_all_users(Jwt(user): Jwt, Extension(pool): Extension<Arc<Pool<Postgres>>>) -> impl IntoResponse {
+pub async fn get_all_users(
+    Jwt(user): Jwt,
+    Extension(pool): Extension<Arc<Pool<Postgres>>>,
+) -> impl IntoResponse {
     if !user.admin {
         return (
             StatusCode::FORBIDDEN,

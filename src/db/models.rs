@@ -24,4 +24,16 @@ pub struct Zone {
     pub owner_uuid: Uuid,
     pub created_at: DateTime<Utc>,
     pub modified_at: DateTime<Utc>,
+    // pub enabled: bool,
+}
+
+#[derive(Serialize, Deserialize, FromRow, Debug)]
+pub struct Record {
+    pub id: u64,
+    pub zone_id: String,
+    pub r#type: String,
+    pub content: String,
+    pub ttl: u32,
+    pub created_at: DateTime<Utc>,
+    pub modified_at: DateTime<Utc>,  
 }

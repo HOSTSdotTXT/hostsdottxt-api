@@ -26,10 +26,7 @@ pub async fn get_zones(pool: &Pool<Postgres>, owner_uuid: Uuid) -> Result<Vec<Zo
     Ok(zones)
 }
 
-pub async fn get_zone(
-    pool: &Pool<Postgres>,
-    id: &str,
-) -> Result<Zone, sqlx::Error> {
+pub async fn get_zone(pool: &Pool<Postgres>, id: &str) -> Result<Zone, sqlx::Error> {
     let zone = sqlx::query_as::<_, Zone>(&strings::GET_ZONE)
         .bind(id)
         .fetch_one(pool)
