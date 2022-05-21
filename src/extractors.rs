@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
 use sha2::Sha256;
+use sqlx::types::Uuid;
 use std::collections::BTreeMap;
 use std::env;
 use std::error::Error;
@@ -26,7 +27,7 @@ pub struct Json<T>(pub T);
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Token {
     pub iss: String,
-    pub sub: String,
+    pub sub: Uuid,
     pub iat: i64,
     pub exp: i64,
     pub dn: String,
@@ -69,7 +70,7 @@ where
 
                 let token = Token {
                     iss: claims.get("iss").unwrap().to_string(),
-                    sub: claims.get("sub").unwrap().to_string(),
+                    sub: Uuid::parse_str(&claims.get("sub").unwrap().to_string()).unwrap(),
                     iat: claims.get("iat").unwrap().parse().unwrap(),
                     exp: claims.get("exp").unwrap().parse().unwrap(),
                     dn: claims.get("dn").unwrap().to_string(),

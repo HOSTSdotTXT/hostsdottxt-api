@@ -17,3 +17,11 @@ pub struct User {
     #[serde(skip_serializing)]
     pub totp_secret: Option<String>,
 }
+
+#[derive(Serialize, Deserialize, FromRow, Debug)]
+pub struct Zone {
+    pub id: String,
+    pub owner_uuid: Uuid,
+    pub created_at: DateTime<Utc>,
+    pub modified_at: DateTime<Utc>,
+}

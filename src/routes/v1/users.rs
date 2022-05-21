@@ -23,6 +23,13 @@ pub async fn create_user(
     Json(signup): Json<requests::Signup>,
     Extension(pool): Extension<Arc<Pool<Postgres>>>,
 ) -> impl IntoResponse {
+    // TODO: Potentially more checks for password strength
+    if signup.password.len() < 12 {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({"error": "Password must be at least 12 characters"})),
+        );
+    }
     let user =
         db::users::create_user(&pool, &signup.email, &signup.password, &signup.display_name).await;
     match user {
@@ -42,7 +49,14 @@ pub async fn create_user(
     }
 }
 
-pub async fn get_all_users(Extension(pool): Extension<Arc<Pool<Postgres>>>) -> impl IntoResponse {
+pub async fn get_all_users(Jwt(user): Jwt, Extension(pool): Extension<Arc<Pool<Postgres>>>) -> impl IntoResponse {
+    if !user.admin {
+        return (
+            StatusCode::FORBIDDEN,
+            Json(json!({"error": "You do not have permission to perform this action"})),
+        );
+    }
+
     let users = db::users::get_all_users(&pool).await;
     match users {
         Ok(users) => (StatusCode::OK, Json(json!(users))),

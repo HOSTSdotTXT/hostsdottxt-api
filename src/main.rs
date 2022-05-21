@@ -45,21 +45,30 @@ async fn main() {
             "/api",
             Router::new().nest(
                 "/v1",
-                Router::new().route("/", get(root)).nest(
-                    "/users",
-                    Router::new()
-                        .route("/", post(routes::v1::users::create_user))
-                        .route("/all", get(routes::v1::users::get_all_users))
-                        .route("/totp", get(routes::v1::users::needs_totp))
-                        .route("/login", post(routes::v1::users::login))
-                        .route("/whoami", get(routes::v1::users::whoami)),
-                ),
+                Router::new()
+                    .route("/", get(root))
+                    .nest(
+                        "/users",
+                        Router::new()
+                            .route("/", post(routes::v1::users::create_user))
+                            .route("/", get(routes::v1::users::get_all_users))
+                            .route("/totp", get(routes::v1::users::needs_totp))
+                            .route("/login", post(routes::v1::users::login))
+                            .route("/whoami", get(routes::v1::users::whoami)),
+                    )
+                    .nest(
+                        "/zones",
+                        Router::new()
+                            .route("/", get(routes::v1::zones::list_zones))
+                            .route("/:id", post(routes::v1::zones::create_zone))
+                            .route("/:id", get(routes::v1::zones::get_zone)),
+                    ),
             ),
         )
         .layer(
             ServiceBuilder::new()
                 .layer(TraceLayer::new_for_http())
-                .layer(Extension(pg_pool)),
+                .layer(Extension(pg_pool))
         );
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));

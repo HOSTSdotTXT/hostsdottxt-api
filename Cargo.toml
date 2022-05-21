@@ -6,28 +6,27 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.56"
-axum = "0.5.1"
-bcrypt = "0.12.1"
+anyhow = "1.0.57"
+axum = "0.5.6"
+bcrypt = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 dotenvy = "0.15.1"
 hmac = "0.12.1"
 jwt = "0.16.0"
 lazy_static = "1.4.0"
-log = "0.4.16"
+log = "0.4.17"
 mime = "0.3.16"
-#powerdns = "0.1.1"
-powerdns = { path = "../powerdns/" }
 rand = "0.8.5"
-serde = { version = "1.0.136", features = ["derive"] }
-serde_json = "1.0.79"
+serde = { version = "1.0.137", features = ["derive"] }
+serde_json = "1.0.81"
 sha2 = "0.10.2"
 sqlx = { version = "0.5.13", features = ["postgres", "runtime-tokio-rustls", "chrono", "uuid"] }
-tokio = { version = "1.17.0", features = ["full"] }
-totp-rs = "0.7.4"
+tokio = { version = "1.18.2", features = ["full"] }
+totp-rs = "1.4.0"
 tower = "0.4.12"
-tower-http = { version = "0.2.5", features = ["cors", "trace"] }
+tower-http = { version = "0.3.3", features = ["cors", "trace"] }
 tracing-subscriber = "0.3.11"
+# uuid v1.0.0 is out, but it breaks sqlx... we just have to wait for sqlx to release v0.6
 uuid = { version = "0.8.2", features = ["serde", "v4"] }
 
 [features]
