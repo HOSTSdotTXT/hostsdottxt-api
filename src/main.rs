@@ -60,8 +60,12 @@ async fn main() {
                         "/zones",
                         Router::new()
                             .route("/", get(routes::v1::zones::list_zones))
-                            .route("/:id", post(routes::v1::zones::create_zone))
-                            .route("/:id", get(routes::v1::zones::get_zone)),
+                            .route(
+                                "/:zone_id",
+                                get(routes::v1::records::get_records)
+                                    .post(routes::v1::zones::create_zone)
+                                    .put(routes::v1::records::create_record),
+                            ),
                     ),
             ),
         )

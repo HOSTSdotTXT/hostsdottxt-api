@@ -70,7 +70,7 @@ where
 
                 let token = Token {
                     iss: claims.get("iss").unwrap().to_string(),
-                    sub: Uuid::parse_str(&claims.get("sub").unwrap().to_string()).unwrap(),
+                    sub: Uuid::parse_str(claims.get("sub").unwrap()).unwrap(),
                     iat: claims.get("iat").unwrap().parse().unwrap(),
                     exp: claims.get("exp").unwrap().parse().unwrap(),
                     dn: claims.get("dn").unwrap().to_string(),

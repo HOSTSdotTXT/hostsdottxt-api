@@ -24,4 +24,11 @@ lazy_static! {
         SELECT id,owner_uuid,created_at,modified_at
             FROM zones WHERE id = $1
     ";
+    pub(crate) static ref CREATE_RECORD: &'static str = r"
+        INSERT INTO records(zone_id,name,type,content,ttl) VALUES ($1, $2, $3, $4, $5) RETURNING *
+    ";
+    pub(crate) static ref GET_RECORDS: &'static str = r"
+        SELECT id,zone_id,name,type,content,ttl,created_at,modified_at
+            FROM records WHERE zone_id = $1
+    ";
 }

@@ -11,8 +11,12 @@ use sqlx::{Error, Pool, Postgres};
 use std::sync::Arc;
 
 lazy_static! {
-    static ref NAMESERVERS: Vec<String> =
-        Vec::from([String::from("ns1.fdns.dev."), String::from("ns2.fdns.dev."), String::from("ns3.fdns.dev."), String::from("ns4.fdns.dev.")]);
+    static ref NAMESERVERS: Vec<String> = Vec::from([
+        String::from("ns1.fdns.dev."),
+        String::from("ns2.fdns.dev."),
+        String::from("ns3.fdns.dev."),
+        String::from("ns4.fdns.dev.")
+    ]);
 }
 
 pub async fn list_zones(
@@ -30,11 +34,11 @@ pub async fn list_zones(
 }
 
 pub async fn create_zone(
-    Path(id): Path<String>,
+    Path(zone_id): Path<String>,
     Jwt(user): Jwt,
     Extension(pool): Extension<Arc<Pool<Postgres>>>,
 ) -> impl IntoResponse {
-    let domain = ensure_trailing_dot(&id);
+    let domain = ensure_trailing_dot(&zone_id);
     let domain = addr::parse_domain_name(&domain).unwrap();
     if !domain.has_known_suffix() {
         return (
@@ -72,33 +76,7 @@ pub async fn create_zone(
     }
 }
 
-pub async fn get_zone(
-    Path(id): Path<String>,
-    Jwt(user): Jwt,
-    Extension(pool): Extension<Arc<Pool<Postgres>>>,
-) -> impl IntoResponse {
-    let domain = ensure_trailing_dot(&id);
-
-    let zone = db::zones::get_zone(&pool, &domain).await;
-    if zone.is_err() {
-        return (
-            StatusCode::NOT_FOUND,
-            Json(json!({ "error": format!("Zone {domain} not found") })),
-        );
-    }
-    let zone = zone.unwrap();
-
-    if zone.owner_uuid != user.sub {
-        return (
-            StatusCode::FORBIDDEN,
-            Json(json!({ "error": "You do have permissions to view this zone" })),
-        );
-    }
-
-    (StatusCode::OK, Json(json!(zone)))
-}
-
-fn ensure_trailing_dot(domain: &str) -> String {
+pub(crate) fn ensure_trailing_dot(domain: &str) -> String {
     if domain.ends_with('.') {
         return domain.to_string();
     }

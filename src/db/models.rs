@@ -29,11 +29,14 @@ pub struct Zone {
 
 #[derive(Serialize, Deserialize, FromRow, Debug)]
 pub struct Record {
-    pub id: u64,
+    pub id: Uuid,
     pub zone_id: String,
-    pub r#type: String,
+    pub name: String,
+    #[serde(rename = "type")]
+    #[sqlx(rename = "type")]
+    pub record_type: String,
     pub content: String,
-    pub ttl: u32,
+    pub ttl: i32,
     pub created_at: DateTime<Utc>,
-    pub modified_at: DateTime<Utc>,  
+    pub modified_at: DateTime<Utc>,
 }

@@ -22,8 +22,9 @@ CREATE TABLE IF NOT EXISTS zones (
 );
 
 CREATE TABLE IF NOT EXISTS records (
-  id SERIAL PRIMARY KEY,
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   zone_id varchar(255) NOT NULL,
+  name varchar(255) NOT NULL,
   type varchar(16) NOT NULL,
   content TEXT NOT NULL,
   ttl INTEGER NOT NULL,
