@@ -1,7 +1,7 @@
 use axum::extract::Extension;
 use axum::{
     response::IntoResponse,
-    routing::{get, post},
+    routing::{get, post, put},
     Router, Server,
 };
 use dotenvy::dotenv;
@@ -65,7 +65,8 @@ async fn main() {
                                 get(routes::v1::records::get_records)
                                     .post(routes::v1::zones::create_zone)
                                     .put(routes::v1::records::create_record),
-                            ),
+                            )
+                            .route("/:zone_id/:record_id", put(routes::v1::records::update_record)),
                     ),
             ),
         )
