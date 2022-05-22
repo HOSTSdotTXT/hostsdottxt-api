@@ -1,4 +1,5 @@
 use crate::db;
+use crate::db::models::User;
 use crate::extractors::{Json, Jwt};
 use crate::routes::v1::requests;
 use axum::extract::Query;
@@ -33,7 +34,7 @@ pub async fn create_user(
     let user =
         db::users::create_user(&pool, &signup.email, &signup.password, &signup.display_name).await;
     match user {
-        Ok(user) => (StatusCode::OK, Json(json!(user))),
+        Ok(user) => (StatusCode::OK, Json(json!({ "token": issue_jwt(user) }))),
         Err(err) => match err {
             Error::Database(e) if e.code().unwrap_or(std::borrow::Cow::Borrowed("")) == "23505" => {
                 (
@@ -129,6 +130,11 @@ pub async fn login(
         );
     }
 
+    let token = issue_jwt(user);
+    (StatusCode::OK, Json(json!({ "token": token })))
+}
+
+fn issue_jwt(user: User) -> String {
     let key: Hmac<Sha256> = Hmac::new_from_slice((*JWT_SECRET).as_bytes()).unwrap();
     let mut claims = BTreeMap::new();
 
@@ -136,7 +142,7 @@ pub async fn login(
     let exp = (chrono::Utc::now() + chrono::Duration::hours(24))
         .timestamp()
         .to_string();
-    let dn = user.display_name.unwrap_or_else(|| "".to_string());
+    let dn = user.display_name.unwrap_or_else(|| user.email.clone());
     let admin = user.admin.to_string();
     let sub = user.id.to_string();
 
@@ -150,5 +156,5 @@ pub async fn login(
     claims.insert("admin", &admin);
 
     let token = claims.sign_with_key(&key).unwrap();
-    (StatusCode::OK, Json(json!({ "token": token })))
+    token
 }

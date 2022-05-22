@@ -2,5 +2,5 @@ pub mod records;
 pub mod users;
 pub mod zones;
 
-mod models;
+pub mod models;
 mod strings;
