@@ -28,7 +28,10 @@ lazy_static! {
         INSERT INTO records(zone_id,name,type,content,ttl) VALUES ($1, $2, $3, $4, $5) RETURNING *
     ";
     pub(crate) static ref UPDATE_RECORD: &'static str = r"
-        UPDATE records SET name = $1, type = $2, content = $3, ttl = $4 WHERE id = $5 RETURNING *
+        UPDATE records SET name = $1, type = $2, content = $3, ttl = $4 WHERE id = $5 AND zone_id = $6 RETURNING *
+    ";
+    pub(crate) static ref DELETE_RECORD: &'static str = r"
+        DELETE FROM records WHERE id = $1 AND zone_id = $2
     ";
     pub(crate) static ref GET_RECORDS: &'static str = r"
         SELECT id,zone_id,name,type,content,ttl,created_at,modified_at

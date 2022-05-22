@@ -26,6 +26,7 @@ pub async fn create_record(
 
 pub async fn update_record(
     pool: &Pool<Postgres>,
+    zone_id: &str,
     record_id: &Uuid,
     name: &str,
     record_type: &str,
@@ -39,10 +40,26 @@ pub async fn update_record(
         .bind(content)
         .bind(ttl)
         .bind(record_id)
+        .bind(zone_id)
         .fetch_one(&mut transaction)
         .await?;
     transaction.commit().await?;
     Ok(record)
+}
+
+pub async fn delete_record(
+    pool: &Pool<Postgres>,
+    zone_id: &str,
+    record_id: &Uuid,
+) -> Result<(), sqlx::Error> {
+    let mut transaction = pool.begin().await?;
+    sqlx::query(&strings::DELETE_RECORD)
+        .bind(record_id)
+        .bind(zone_id)
+        .execute(&mut transaction)
+        .await?;
+    transaction.commit().await?;
+    Ok(())
 }
 
 pub async fn get_records(pool: &Pool<Postgres>, zone_id: &str) -> Result<Vec<Record>, sqlx::Error> {

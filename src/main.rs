@@ -66,7 +66,11 @@ async fn main() {
                                     .post(routes::v1::zones::create_zone)
                                     .put(routes::v1::records::create_record),
                             )
-                            .route("/:zone_id/:record_id", put(routes::v1::records::update_record)),
+                            .route(
+                                "/:zone_id/:record_id",
+                                put(routes::v1::records::update_record)
+                                    .delete(routes::v1::records::delete_record),
+                            ),
                     ),
             ),
         )
