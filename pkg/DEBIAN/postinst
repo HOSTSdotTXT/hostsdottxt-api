@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ ! -f /etc/fdns.env ]; then
+	echo "DATABASE_URL=" >> /etc/fdns.env
+	echo "JWT_SECRET=" >> /etc/fdns.env
+fi

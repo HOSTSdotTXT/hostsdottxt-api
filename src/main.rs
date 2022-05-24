@@ -22,6 +22,11 @@ async fn main() {
     // Load configuration from .env
     dotenv().ok();
 
+    if std::env::args().nth(1) == Some("--version".to_string()) {
+        println!("{}", option_env!("CARGO_PKG_VERSION").unwrap_or_else(|| "unknown"));
+        return;
+    }
+
     // Set logging levels if not already set
     if env::var_os("RUST_LOG").is_none() {
         env::set_var("RUST_LOG", "fdns_api=debug,tower_http=debug");

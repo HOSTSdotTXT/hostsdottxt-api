@@ -1,0 +1,9 @@
+Package: fdns-api
+Version: {{ VERSION }}
+Architecture: amd64
+Essential: no
+Section: web
+Priority: optional
+Maintainer: Galen Guyer <galen@galenguyer.com>
+Installed-Size: 96
+Description: FDNS API binary
