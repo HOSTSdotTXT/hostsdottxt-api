@@ -4,3 +4,5 @@ if [ ! -f /etc/fdns.env ]; then
 	echo "DATABASE_URL=" >> /etc/fdns.env
 	echo "JWT_SECRET=" >> /etc/fdns.env
 fi
+
+systemctl is-active --quiet fdns-api && systemctl restart fdns-api || true

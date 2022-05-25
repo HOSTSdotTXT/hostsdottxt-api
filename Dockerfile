@@ -1,9 +1,5 @@
 FROM rust:1.61-bullseye AS builder
 WORKDIR /src/
-RUN cargo init --bin
-COPY Cargo.toml Cargo.lock /src/
-RUN cargo build --release
-
 COPY . /src/
 RUN cargo build --release
 
