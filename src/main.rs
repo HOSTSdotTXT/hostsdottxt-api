@@ -1,6 +1,5 @@
 use axum::extract::Extension;
 use axum::{
-    response::IntoResponse,
     routing::{get, post, put},
     Router, Server,
 };
@@ -23,7 +22,10 @@ async fn main() {
     dotenv().ok();
 
     if std::env::args().nth(1) == Some("--version".to_string()) {
-        println!("{}", option_env!("CARGO_PKG_VERSION").unwrap_or_else(|| "unknown"));
+        println!(
+            "{}",
+            option_env!("CARGO_PKG_VERSION").unwrap_or_else(|| "unknown")
+        );
         return;
     }
 
@@ -51,7 +53,6 @@ async fn main() {
             Router::new().nest(
                 "/v1",
                 Router::new()
-                    .route("/", get(root))
                     .nest(
                         "/users",
                         Router::new()
@@ -89,9 +90,7 @@ async fn main() {
     info!("Binding to {addr}");
 
     Server::bind(&addr)
-        .serve(app.into_make_service())
+        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
         .await
         .unwrap();
 }
-
-async fn root() -> impl IntoResponse {}

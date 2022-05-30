@@ -155,6 +155,5 @@ fn issue_jwt(user: User) -> String {
     claims.insert("email", &user.email);
     claims.insert("admin", &admin);
 
-    let token = claims.sign_with_key(&key).unwrap();
-    token
+    claims.sign_with_key(&key).unwrap()
 }

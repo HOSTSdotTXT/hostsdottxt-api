@@ -7,8 +7,8 @@ use axum::response::IntoResponse;
 use axum::Extension;
 use serde_json::json;
 use sqlx::{Pool, Postgres};
-use uuid::Uuid;
 use std::sync::Arc;
+use uuid::Uuid;
 
 pub async fn get_records(
     Path(id): Path<String>,
@@ -166,12 +166,8 @@ pub async fn delete_record(
     // TODO: Make sure record exists
     // TODO: Check to make sure record is within zone
 
-    let result = db::records::delete_record(
-        &pool,
-        &zone_id,
-        &Uuid::parse_str(&record_id).unwrap(),
-    )
-    .await;
+    let result =
+        db::records::delete_record(&pool, &zone_id, &Uuid::parse_str(&record_id).unwrap()).await;
     if result.is_err() {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -179,5 +175,10 @@ pub async fn delete_record(
         );
     }
 
-    (StatusCode::OK, Json(json!({"message": format!("Record {} deleted", record_id)})))
+    (
+        StatusCode::OK,
+        Json(json!({
+            "message": format!("Record {} deleted", record_id)
+        })),
+    )
 }
