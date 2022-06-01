@@ -53,6 +53,7 @@ async fn main() {
             Router::new().nest(
                 "/v1",
                 Router::new()
+                    .route("/features", get(routes::v1::features::get_features))
                     .nest(
                         "/users",
                         Router::new()
