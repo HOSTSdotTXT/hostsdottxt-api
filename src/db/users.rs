@@ -39,3 +39,14 @@ pub async fn create_user(
     transaction.commit().await?;
     Ok(user)
 }
+
+pub async fn get_user_from_api_key(
+    pool: &Pool<Postgres>,
+    token_hash: &str,
+) -> Result<User, sqlx::Error> {
+    let user = sqlx::query_as::<_, User>(&strings::GET_USER_FROM_API_KEY)
+        .bind(token_hash)
+        .fetch_one(pool)
+        .await?;
+    Ok(user)
+}

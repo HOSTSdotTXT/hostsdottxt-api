@@ -13,13 +13,15 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
-use sha2::Sha256;
+use sha2::{Digest, Sha256};
 use sqlx::types::Uuid;
+use sqlx::{Pool, Postgres};
 use std::collections::BTreeMap;
 use std::env;
 use std::error::Error;
 use std::net::IpAddr;
 use std::net::SocketAddr;
+use std::sync::Arc;
 
 lazy_static! {
     static ref JWT_SECRET: String = env::var("JWT_SECRET").unwrap();
@@ -46,7 +48,7 @@ where
     B::Data: Send,
     B::Error: Into<BoxError>,
 {
-    type Rejection = (axum::http::StatusCode, axum::Json<serde_json::Value>);
+    type Rejection = (axum::http::StatusCode, Json<serde_json::Value>);
 
     async fn from_request(
         req: &mut axum::extract::RequestParts<B>,
@@ -61,12 +63,40 @@ where
             Some(header) => {
                 let key: Hmac<Sha256> = Hmac::new_from_slice((*JWT_SECRET).as_bytes()).unwrap();
                 let token = header.replace("Bearer ", "");
+                if token.starts_with("fdns_") {
+                    let mut hasher = Sha256::new();
+                    hasher.update(token.as_bytes());
+                    let digest = hasher.finalize();
+                    let hash = hex::encode(digest);
+
+                    let db_pool = req.extensions().get::<Arc<Pool<Postgres>>>().unwrap();
+
+                    let user = match crate::db::users::get_user_from_api_key(db_pool, &hash).await {
+                        Ok(user) => user,
+                        Err(err) => {
+                            return Err((
+                                StatusCode::INTERNAL_SERVER_ERROR,
+                                Json(json!({"error": err.to_string()})),
+                            ))
+                        }
+                    };
+                    let token = Token {
+                        iss: "fdns".to_owned(),
+                        sub: user.id,
+                        iat: 0,
+                        exp: 0,
+                        dn: user.display_name.unwrap_or_else(|| "".to_owned()),
+                        email: user.email.to_owned(),
+                        admin: user.admin,
+                    };
+                    return Ok(Self(token))
+                }
                 let claims: BTreeMap<String, String> = match token.verify_with_key(&key) {
                     Ok(claims) => claims,
                     Err(_) => {
                         return Err((
                             StatusCode::UNAUTHORIZED,
-                            axum::Json(json!({ "error": "Invalid token" })),
+                            Json(json!({ "error": "Invalid token" })),
                         ))
                     }
                 };
@@ -85,7 +115,7 @@ where
                 if token.iat > now || token.exp < now {
                     return Err((
                         StatusCode::UNAUTHORIZED,
-                        axum::Json(json!({"error": "Invalid token"})),
+                        Json(json!({"error": "Invalid token"})),
                     ));
                 }
 
@@ -94,7 +124,7 @@ where
             None => {
                 return Err((
                     StatusCode::UNAUTHORIZED,
-                    axum::Json(json!({"error": "missing auth header"})),
+                    Json(json!({"error": "missing auth header"})),
                 ))
             }
         }

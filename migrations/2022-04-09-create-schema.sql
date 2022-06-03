@@ -33,6 +33,16 @@ CREATE TABLE IF NOT EXISTS records (
   constraint zone_id_fk foreign key (zone_id) references zones (id)
 );
 
+CREATE TABLE IF NOT EXISTS api_keys (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  owner_uuid uuid NOT NULL,
+  token_hash varchar(255) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  last_used TIMESTAMP WITH TIME ZONE,
+  constraint owner_uuid_fk foreign key (owner_uuid) references users (id)
+);
+
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
 BEGIN

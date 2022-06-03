@@ -85,11 +85,8 @@ async fn main() {
                     ),
             ),
         )
-        .layer(
-            ServiceBuilder::new()
-                .layer(TraceLayer::new_for_http())
-                .layer(Extension(pg_pool)),
-        );
+        .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()))
+        .layer(Extension(pg_pool));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
     info!("Binding to {addr}");

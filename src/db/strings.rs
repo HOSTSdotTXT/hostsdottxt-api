@@ -37,4 +37,11 @@ lazy_static! {
         SELECT id,zone_id,name,type,content,ttl,created_at,modified_at
             FROM records WHERE zone_id = $1
     ";
+    pub(crate) static ref GET_USER_FROM_API_KEY: &'static str = r"
+    SELECT users.id,email,password,display_name,users.created_at,modified_at,admin,enabled,totp_secret FROM api_keys
+        JOIN users
+            ON users.id = api_keys.owner_uuid
+        WHERE api_keys.token_hash = $1 
+            AND api_keys.expires_at > (now() AT TIME ZONE 'UTC');
+    ";
 }

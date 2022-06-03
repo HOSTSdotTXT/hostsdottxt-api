@@ -1,6 +1,6 @@
 [package]
 name = "fdns-api"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -12,6 +12,7 @@ axum = "0.5.6"
 bcrypt = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 dotenvy = "0.15.1"
+hex = "0.4.3"
 hmac = "0.12.1"
 jwt = "0.16.0"
 lazy_static = "1.4.0"
@@ -23,7 +24,7 @@ serde_json = "1.0.81"
 sha2 = "0.10.2"
 sqlx = { version = "0.5.13", features = ["postgres", "runtime-tokio-rustls", "chrono", "uuid"] }
 tokio = { version = "1.18.2", features = ["full"] }
-totp-rs = "1.4.0"
+totp-rs = "2.0.0"
 tower = "0.4.12"
 tower-http = { version = "0.3.3", features = ["cors", "trace"] }
 tracing-subscriber = "0.3.11"
