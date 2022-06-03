@@ -14,6 +14,7 @@ use tower_http::trace::TraceLayer;
 
 mod db;
 mod extractors;
+mod features;
 mod routes;
 
 #[tokio::main]
