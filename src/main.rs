@@ -30,6 +30,9 @@ async fn main() {
         return;
     }
 
+    println!("SIGNUPS_ENABLED = {}", *features::SIGNUPS_ENABLED);
+    println!("TOTP_ENABLED = {}", *features::TOTP_ENABLED);
+
     // Set logging levels if not already set
     if env::var_os("RUST_LOG").is_none() {
         env::set_var("RUST_LOG", "fdns_api=debug,tower_http=debug");
