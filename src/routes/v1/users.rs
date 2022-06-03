@@ -24,6 +24,12 @@ pub async fn create_user(
     Json(signup): Json<requests::Signup>,
     Extension(pool): Extension<Arc<Pool<Postgres>>>,
 ) -> impl IntoResponse {
+    if !(*crate::features::SIGNUPS_ENABLED) {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "Signups are not enabled" })),
+        );
+    }
     // TODO: Potentially more checks for password strength
     if signup.password.len() < 12 {
         return (
