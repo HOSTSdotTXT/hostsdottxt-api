@@ -85,6 +85,12 @@ pub async fn needs_totp(
     Query(params): Query<HashMap<String, String>>,
     Extension(pool): Extension<Arc<Pool<Postgres>>>,
 ) -> impl IntoResponse {
+    if !(*crate::features::TOTP_ENABLED) {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "TOTP is not enabled" })),
+        );
+    }
     match params.get("email") {
         Some(email) => match db::users::get_user(&pool, email).await {
             Ok(user) => (
