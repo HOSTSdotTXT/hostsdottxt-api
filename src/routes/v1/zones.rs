@@ -2,10 +2,12 @@ use crate::db;
 use crate::extractors::Json;
 use crate::extractors::Jwt;
 use axum::extract::Path;
+use axum::extract::Query;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Extension;
 use lazy_static::lazy_static;
+use serde::Deserialize;
 use serde_json::json;
 use sqlx::{Error, Pool, Postgres};
 use std::sync::Arc;
@@ -30,6 +32,33 @@ pub async fn list_zones(
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(json!({"error": err.to_string()})),
         ),
+    }
+}
+
+#[derive(Deserialize)]
+pub struct RootDomainQuery {
+    domain: String,
+}
+pub async fn get_root_domain(
+    Query(query): Query<RootDomainQuery>,
+    Jwt(user): Jwt,
+    Extension(pool): Extension<Arc<Pool<Postgres>>>,
+) -> impl IntoResponse {
+    let zones = db::zones::get_zones(&pool, user.sub).await;
+    let domain = match query.domain.ends_with(".") {
+        true => query.domain,
+        false => format!("{}.", query.domain),
+    };
+
+    match zones {
+        Ok(zones) => {
+            let longest_zone = zones
+                .iter()
+                .filter(|zone| domain.ends_with(&format!(".{}", zone.id)))
+                .max_by(|x, y| x.id.len().cmp(&y.id.len()));
+            (StatusCode::OK, longest_zone.unwrap().id.clone())
+        }
+        Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()),
     }
 }
 

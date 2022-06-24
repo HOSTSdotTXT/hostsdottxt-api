@@ -89,7 +89,7 @@ where
                         email: user.email.to_owned(),
                         admin: user.admin,
                     };
-                    return Ok(Self(token))
+                    return Ok(Self(token));
                 }
                 let claims: BTreeMap<String, String> = match token.verify_with_key(&key) {
                     Ok(claims) => claims,

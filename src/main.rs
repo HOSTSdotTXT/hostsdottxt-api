@@ -71,6 +71,7 @@ async fn main() {
                         "/zones",
                         Router::new()
                             .route("/", get(routes::v1::zones::list_zones))
+                            .route("/root", get(routes::v1::zones::get_root_domain))
                             .route(
                                 "/:zone_id",
                                 get(routes::v1::records::get_records)
