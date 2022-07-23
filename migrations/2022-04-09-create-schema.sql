@@ -1,4 +1,6 @@
-CREATE extension IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pg_prewarm";
+ALTER SYSTEM SET shared_preload_libraries = 'pg_prewarm';
 
 CREATE TABLE IF NOT EXISTS users (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
