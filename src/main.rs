@@ -35,7 +35,7 @@ async fn main() {
 
     // Set logging levels if not already set
     if env::var_os("RUST_LOG").is_none() {
-        env::set_var("RUST_LOG", "fdns_api=debug,tower_http=debug");
+        env::set_var("RUST_LOG", "hdt_api=debug,tower_http=debug");
     }
 
     // Initialize tracing with previously set logging levels

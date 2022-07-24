@@ -2,9 +2,9 @@ services:
   postgres:
     image: docker.io/library/postgres:14-bullseye
     environment:
-      - "POSTGRES_USER=fdns"
+      - "POSTGRES_USER=hostsdottxt"
       - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
-      - "POSTGRES_DB=fdns"
+      - "POSTGRES_DB=hostsdottxt"
       - "PGDATA=/var/lib/postgresql/data/pgdata"
     ports:
       - 127.0.0.1:5432:5432

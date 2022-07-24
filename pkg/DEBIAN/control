@@ -1,4 +1,4 @@
-Package: fdns-api
+Package: hdt-api
 Version: {{ VERSION }}
 Architecture: amd64
 Essential: no

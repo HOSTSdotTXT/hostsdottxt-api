@@ -63,7 +63,7 @@ where
             Some(header) => {
                 let key: Hmac<Sha256> = Hmac::new_from_slice((*JWT_SECRET).as_bytes()).unwrap();
                 let token = header.replace("Bearer ", "");
-                if token.starts_with("fdns_") {
+                if token.starts_with("hdt_") {
                     let mut hasher = Sha256::new();
                     hasher.update(token.as_bytes());
                     let digest = hasher.finalize();
@@ -81,7 +81,7 @@ where
                         }
                     };
                     let token = Token {
-                        iss: "fdns".to_owned(),
+                        iss: "hostsdottxt".to_owned(),
                         sub: user.id,
                         iat: 0,
                         exp: 0,

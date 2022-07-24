@@ -1,5 +1,5 @@
 [Unit]
-Description=FDNS API
+Description=HOSTSdotTXT API
 After=network.target
 After=systemd-user-sessions.service
 After=network-online.target
@@ -7,8 +7,8 @@ After=network-online.target
 [Service]
 Type=simple
 Restart=always
-EnvironmentFile=/etc/fdns.env
-ExecStart=/usr/bin/fdns-api
+EnvironmentFile=/etc/hostsdottxt.env
+ExecStart=/usr/bin/hdt-api
 
 [Install]
 WantedBy=multi-user.target

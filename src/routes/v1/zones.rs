@@ -14,10 +14,10 @@ use std::sync::Arc;
 
 lazy_static! {
     static ref NAMESERVERS: Vec<String> = Vec::from([
-        String::from("ns1.fdns.dev."),
-        String::from("ns2.fdns.dev."),
-        String::from("ns3.fdns.dev."),
-        String::from("ns4.fdns.dev.")
+        String::from("ns1.hostsdottxt.net."),
+        String::from("ns2.hostsdottxt.net."),
+        String::from("ns3.hostsdottxt.net."),
+        String::from("ns4.hostsdottxt.net.")
     ]);
 }
 

@@ -159,7 +159,7 @@ fn issue_jwt(user: User) -> String {
     let sub = user.id.to_string();
 
     // https://www.iana.org/assignments/jwt/jwt.xhtml
-    claims.insert("iss", "fdns");
+    claims.insert("iss", "hostsdottxt");
     claims.insert("sub", &sub);
     claims.insert("iat", &iat);
     claims.insert("exp", &exp);
