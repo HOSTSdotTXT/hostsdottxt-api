@@ -11,6 +11,7 @@ use serde::Deserialize;
 use serde_json::json;
 use sqlx::{Error, Pool, Postgres};
 use std::sync::Arc;
+use whois_rust::{WhoIs, WhoIsLookupOptions};
 
 lazy_static! {
     static ref NAMESERVERS: Vec<String> = Vec::from([
@@ -66,6 +67,7 @@ pub async fn create_zone(
     Path(zone_id): Path<String>,
     Jwt(user): Jwt,
     Extension(pool): Extension<Arc<Pool<Postgres>>>,
+    Extension(whois_client): Extension<WhoIs>,
 ) -> impl IntoResponse {
     let domain = ensure_trailing_dot(&zone_id);
     let domain = addr::parse_domain_name(&domain).unwrap();
@@ -85,6 +87,44 @@ pub async fn create_zone(
                 "message": "Domain must be a root domain"
             })),
         );
+    }
+
+    let lookup = match WhoIsLookupOptions::from_string(&*zone_id.trim_end_matches('.')) {
+        Ok(lookup) => lookup,
+        Err(e) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({
+                    "error": "Invalid domain",
+                    "message": format!("Could not parse WhoIs Lookup ({})", e)
+                })),
+            )
+        }
+    };
+    let whois_res = match whois_client.lookup(lookup) {
+        Ok(res) => {
+            res
+        }
+        Err(e) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({
+                    "error": "Invalid domain",
+                    "message": format!("{}", e)
+                })),
+            )
+        }
+    };
+
+    let whois_info = whoisthere::parse_info(&*zone_id.trim_end_matches('.'), &whois_res);
+    if !whois_info.is_registered || whois_info.is_under_grace_period {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({
+                "error": "Invalid domain",
+                "message": "Domain is not registered or expired"
+            })),
+        )
     }
 
     let zone = db::zones::create_zone(&pool, &zone_id, user.sub).await;

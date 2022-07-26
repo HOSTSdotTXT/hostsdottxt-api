@@ -51,6 +51,13 @@ async fn main() {
     );
     info!("Postgres pool initialized");
 
+    // Create our WhoIs client
+    let whois_client = whois_rust::WhoIs::from_string(include_str!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/data/whois-servers.json"
+    )))
+    .unwrap();
+
     let app = Router::new()
         .nest(
             "/api",
@@ -87,7 +94,8 @@ async fn main() {
             ),
         )
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()))
-        .layer(Extension(pg_pool));
+        .layer(Extension(pg_pool))
+        .layer(Extension(whois_client));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
     info!("Binding to {addr}");
