@@ -10,7 +10,7 @@ use sqlx::{Pool, Postgres};
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::FromStr;
 use std::sync::Arc;
-use trust_dns_proto::rr::RecordType;
+use trust_dns_proto::rr::{Name, RecordType};
 use uuid::Uuid;
 
 pub async fn get_records(
@@ -205,6 +205,15 @@ fn validate_record(rtype: &str, content: &str) -> Result<(), String> {
                 .parse::<Ipv6Addr>()
                 .map(|_| ())
                 .map_err(|_| String::from("Invalid IPv6 address")),
+            RecordType::CNAME => content
+                .parse::<Name>()
+                .map(|_| ())
+                .map_err(|_| String::from("Invalid CNAME")),
+            RecordType::MX => content
+                .parse::<Name>()
+                .map(|_| ())
+                .map_err(|_| String::from("Invalid MX record")),
+            RecordType::TXT => Ok(()),
             _ => Err(String::from("Unknown record type")),
         },
         _ => Err(String::from("Unknown record type")),
