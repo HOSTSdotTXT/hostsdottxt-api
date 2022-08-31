@@ -44,7 +44,6 @@ lazy_static! {
             WHERE api_keys.token_hash = $1 
                 AND api_keys.expires_at > (now() AT TIME ZONE 'UTC');
     ";
-
     pub(crate) static ref GET_METRICS: &'static str = r#"
         SELECT
             percentile_cont(0.50) WITHIN GROUP (ORDER BY queries.duration_us) AS p50,

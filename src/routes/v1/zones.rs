@@ -46,7 +46,7 @@ pub async fn get_root_domain(
     Extension(pool): Extension<Arc<Pool<Postgres>>>,
 ) -> impl IntoResponse {
     let zones = db::zones::get_zones(&pool, user.sub).await;
-    let domain = match query.domain.ends_with(".") {
+    let domain = match query.domain.ends_with('.') {
         true => query.domain,
         false => format!("{}.", query.domain),
     };
@@ -89,7 +89,7 @@ pub async fn create_zone(
         );
     }
 
-    let lookup = match WhoIsLookupOptions::from_string(&*zone_id.trim_end_matches('.')) {
+    let lookup = match WhoIsLookupOptions::from_string(zone_id.trim_end_matches('.')) {
         Ok(lookup) => lookup,
         Err(e) => {
             return (
@@ -102,9 +102,7 @@ pub async fn create_zone(
         }
     };
     let whois_res = match whois_client.lookup(lookup) {
-        Ok(res) => {
-            res
-        }
+        Ok(res) => res,
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
@@ -116,7 +114,7 @@ pub async fn create_zone(
         }
     };
 
-    let whois_info = whoisthere::parse_info(&*zone_id.trim_end_matches('.'), &whois_res);
+    let whois_info = whoisthere::parse_info(zone_id.trim_end_matches('.'), &whois_res);
     if !whois_info.is_registered || whois_info.is_under_grace_period {
         return (
             StatusCode::BAD_REQUEST,
@@ -124,7 +122,7 @@ pub async fn create_zone(
                 "error": "Invalid domain",
                 "message": "Domain is not registered or expired"
             })),
-        )
+        );
     }
 
     let zone = db::zones::create_zone(&pool, &zone_id, user.sub).await;

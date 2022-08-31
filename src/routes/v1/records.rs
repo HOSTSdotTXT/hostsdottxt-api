@@ -7,7 +7,10 @@ use axum::response::IntoResponse;
 use axum::Extension;
 use serde_json::json;
 use sqlx::{Pool, Postgres};
+use std::net::{Ipv4Addr, Ipv6Addr};
+use std::str::FromStr;
 use std::sync::Arc;
+use trust_dns_proto::rr::RecordType;
 use uuid::Uuid;
 
 pub async fn get_records(
@@ -68,6 +71,10 @@ pub async fn create_record(
         );
     }
 
+    if let Err(e) = validate_record(&data.record_type, &data.content) {
+        return (StatusCode::BAD_REQUEST, Json(json!({ "error": e })));
+    }
+
     let record = db::records::create_record(
         &pool,
         &zone.id,
@@ -118,6 +125,10 @@ pub async fn update_record(
             StatusCode::BAD_REQUEST,
             Json(json!({"error": "Record name must be fully qualified"})),
         );
+    }
+
+    if let Err(e) = validate_record(&data.record_type, &data.content) {
+        return (StatusCode::BAD_REQUEST, Json(json!({ "error": e })));
     }
 
     let record = db::records::update_record(
@@ -181,4 +192,21 @@ pub async fn delete_record(
             "message": format!("Record {} deleted", record_id)
         })),
     )
+}
+
+fn validate_record(rtype: &str, content: &str) -> Result<(), String> {
+    match RecordType::from_str(rtype) {
+        Ok(rtype) => match rtype {
+            RecordType::A => content
+                .parse::<Ipv4Addr>()
+                .map(|_| ())
+                .map_err(|_| String::from("Invalid IPv4 address")),
+            RecordType::AAAA => content
+                .parse::<Ipv6Addr>()
+                .map(|_| ())
+                .map_err(|_| String::from("Invalid IPv6 address")),
+            _ => Err(String::from("Unknown record type")),
+        },
+        _ => Err(String::from("Unknown record type")),
+    }
 }

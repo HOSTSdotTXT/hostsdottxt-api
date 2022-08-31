@@ -1,6 +1,6 @@
 [package]
 name = "hdt-api"
-version = "0.1.5"
+version = "0.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -28,6 +28,7 @@ totp-rs = "2.0.0"
 tower = "0.4.12"
 tower-http = { version = "0.3.3", features = ["cors", "trace"] }
 tracing-subscriber = "0.3.11"
+trust-dns-proto = "0.21.2"
 # uuid v1.0.0 is out, but it breaks sqlx... we just have to wait for sqlx to release v0.6
 uuid = { version = "0.8.2", features = ["serde", "v4"] }
 whois-rust = "1.5.0"

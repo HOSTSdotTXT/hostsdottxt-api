@@ -545,7 +545,7 @@ dependencies = [
 
 [[package]]
 name = "hdt-api"
-version = "0.1.5"
+version = "0.2.0"
 dependencies = [
  "addr",
  "anyhow",
@@ -569,6 +569,7 @@ dependencies = [
  "tower",
  "tower-http",
  "tracing-subscriber",
+ "trust-dns-proto",
  "uuid",
  "whois-rust",
  "whoisthere",
