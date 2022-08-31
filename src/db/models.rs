@@ -40,3 +40,13 @@ pub struct Record {
     pub created_at: DateTime<Utc>,
     pub modified_at: DateTime<Utc>,
 }
+
+#[derive(Serialize, Deserialize, FromRow, Debug)]
+pub struct Metrics {
+    pub p50: f64,
+    pub p90: f64,
+    pub p95: f64,
+    pub p99: f64,
+    pub avg: f64,
+    pub count: i64,
+}

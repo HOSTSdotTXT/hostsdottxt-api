@@ -38,10 +38,21 @@ lazy_static! {
             FROM records WHERE zone_id = $1
     ";
     pub(crate) static ref GET_USER_FROM_API_KEY: &'static str = r"
-    SELECT users.id,email,password,display_name,users.created_at,modified_at,admin,enabled,totp_secret FROM api_keys
-        JOIN users
-            ON users.id = api_keys.owner_uuid
-        WHERE api_keys.token_hash = $1 
-            AND api_keys.expires_at > (now() AT TIME ZONE 'UTC');
+        SELECT users.id,email,password,display_name,users.created_at,modified_at,admin,enabled,totp_secret FROM api_keys
+            JOIN users
+                ON users.id = api_keys.owner_uuid
+            WHERE api_keys.token_hash = $1 
+                AND api_keys.expires_at > (now() AT TIME ZONE 'UTC');
     ";
+
+    pub(crate) static ref GET_METRICS: &'static str = r#"
+        SELECT
+            percentile_cont(0.50) WITHIN GROUP (ORDER BY queries.duration_us) AS p50,
+            percentile_cont(0.90) WITHIN GROUP (ORDER BY queries.duration_us) AS p90,
+            percentile_cont(0.95) WITHIN GROUP (ORDER BY queries.duration_us) AS p95,
+            percentile_cont(0.99) WITHIN GROUP (ORDER BY queries.duration_us) AS p99,
+            avg(queries.duration_us)::FLOAT8 AS avg,
+            count(queries.duration_us) as count
+        FROM queries WHERE "time" > (NOW() AT TIME ZONE 'UTC' - '1 day'::INTERVAL);
+    "#;
 }

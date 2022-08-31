@@ -50,6 +50,17 @@ async fn main() {
             .unwrap(),
     );
     info!("Postgres pool initialized");
+    let metrics_pool = match env::var("METRICS_URL") {
+        Ok(url) => Some(Arc::new(
+            PgPoolOptions::new()
+                .max_connections(5)
+                .connect(&url)
+                .await
+                .unwrap(),
+        )),
+        Err(_) => None,
+    };
+    info!("Metrics pool (possibly) initialized");
 
     // Create our WhoIs client
     let whois_client = whois_rust::WhoIs::from_string(include_str!(concat!(
@@ -65,6 +76,7 @@ async fn main() {
                 "/v1",
                 Router::new()
                     .route("/features", get(routes::v1::features::get_features))
+                    .route("/metrics", get(routes::v1::metrics::get_metrics))
                     .nest(
                         "/users",
                         Router::new()
@@ -95,6 +107,7 @@ async fn main() {
         )
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()))
         .layer(Extension(pg_pool))
+        .layer(Extension(metrics_pool))
         .layer(Extension(whois_client));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
