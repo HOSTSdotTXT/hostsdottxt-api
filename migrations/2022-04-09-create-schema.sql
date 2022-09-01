@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS zones (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
   modified_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
   owner_uuid uuid NOT NULL,
-  constraint owner_uuid_fk foreign key (owner_uuid) references users (id)
+  constraint owner_uuid_fk foreign key (owner_uuid) references users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS records (
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS records (
   ttl INTEGER NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
   modified_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
-  constraint zone_id_fk foreign key (zone_id) references zones (id)
+  constraint zone_id_fk foreign key (zone_id) references zones (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS api_keys (
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS api_keys (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
   expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
   last_used TIMESTAMP WITH TIME ZONE,
-  constraint owner_uuid_fk foreign key (owner_uuid) references users (id)
+  constraint owner_uuid_fk foreign key (owner_uuid) references users (id) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE FUNCTION update_modified_column()

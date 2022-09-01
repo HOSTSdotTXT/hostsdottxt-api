@@ -126,21 +126,35 @@ pub async fn create_zone(
     }
 
     let zone = db::zones::create_zone(&pool, &zone_id, user.sub).await;
-    match zone {
-        Ok(zone) => (StatusCode::OK, Json(json!(zone))),
-        Err(err) => match err {
+    if let Err(err) = zone {
+        match err {
             Error::Database(e) if e.code().unwrap_or(std::borrow::Cow::Borrowed("")) == "23505" => {
-                (
+                return (
                     StatusCode::BAD_REQUEST,
                     Json(json!({"error": "That zone already exists"})),
                 )
             }
-            _ => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({ "error": format!("{:?}", err) })),
-            ),
-        },
+            _ => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(json!({ "error": format!("{:?}", err) })),
+                )
+            }
+        }
     }
+    let zone = zone.unwrap();
+
+    for ns in NAMESERVERS.iter() {
+        if let Err(e) = db::records::create_record(&pool, &zone.id, &zone_id, "NS", ns, 3600).await
+        {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "error": format!("{:?}", e) })),
+            );
+        }
+    }
+
+    (StatusCode::OK, Json(json!(zone)))
 }
 
 pub(crate) fn ensure_trailing_dot(domain: &str) -> String {
