@@ -85,7 +85,7 @@ where
                         sub: user.id,
                         iat: 0,
                         exp: 0,
-                        dn: user.display_name.unwrap_or_else(|| "".to_owned()),
+                        dn: user.email.to_owned(),
                         email: user.email.to_owned(),
                         admin: user.admin,
                     };

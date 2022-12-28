@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   email varchar(255) NOT NULL UNIQUE,
   password varchar(255) NOT NULL,
-  display_name varchar(255),
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
   modified_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
   admin boolean NOT NULL DEFAULT false,

@@ -27,13 +27,11 @@ pub async fn create_user(
     pool: &Pool<Postgres>,
     email: &str,
     password: &str,
-    display_name: &Option<String>,
 ) -> Result<User, sqlx::Error> {
     let mut transaction = pool.begin().await?;
     let user = sqlx::query_as::<_, User>(&strings::CREATE_USER)
         .bind(email)
         .bind(bcrypt::hash(password, BCRYPT_COST).unwrap())
-        .bind(display_name)
         .fetch_one(&mut transaction)
         .await?;
     transaction.commit().await?;

@@ -37,8 +37,7 @@ pub async fn create_user(
             Json(json!({"error": "Password must be at least 12 characters"})),
         );
     }
-    let user =
-        db::users::create_user(&pool, &signup.email, &signup.password, &signup.display_name).await;
+    let user = db::users::create_user(&pool, &signup.email, &signup.password).await;
     match user {
         Ok(user) => (StatusCode::OK, Json(json!({ "token": issue_jwt(user) }))),
         Err(err) => match err {
@@ -154,7 +153,7 @@ fn issue_jwt(user: User) -> String {
     let exp = (chrono::Utc::now() + chrono::Duration::hours(24))
         .timestamp()
         .to_string();
-    let dn = user.display_name.unwrap_or_else(|| user.email.clone());
+    let dn = user.email.clone();
     let admin = user.admin.to_string();
     let sub = user.id.to_string();
 

@@ -2,16 +2,16 @@ use lazy_static::lazy_static;
 
 lazy_static! {
     pub(crate) static ref GET_USER: &'static str = r"
-        SELECT id,email,password,display_name,created_at,modified_at,admin,enabled,totp_secret
+        SELECT id,email,password,created_at,modified_at,admin,enabled,totp_secret
             FROM users
             WHERE email = $1
     ";
     pub(crate) static ref GET_ALL_USERS: &'static str = r"
-        SELECT id,email,password,display_name,created_at,modified_at,admin,enabled,totp_secret
+        SELECT id,email,password,created_at,modified_at,admin,enabled,totp_secret
             FROM users
     ";
     pub(crate) static ref CREATE_USER: &'static str = r"
-        INSERT INTO users(email,password,display_name) VALUES ($1, $2, $3) RETURNING *
+        INSERT INTO users(email,password) VALUES ($1, $2) RETURNING *
     ";
     pub(crate) static ref CREATE_ZONE: &'static str = r"
         INSERT INTO zones(id,owner_uuid) VALUES ($1, $2) RETURNING *
@@ -38,7 +38,7 @@ lazy_static! {
             FROM records WHERE zone_id = $1
     ";
     pub(crate) static ref GET_USER_FROM_API_KEY: &'static str = r"
-        SELECT users.id,email,password,display_name,users.created_at,modified_at,admin,enabled,totp_secret FROM api_keys
+        SELECT users.id,email,password,users.created_at,modified_at,admin,enabled,totp_secret FROM api_keys
             JOIN users
                 ON users.id = api_keys.owner_uuid
             WHERE api_keys.token_hash = $1 

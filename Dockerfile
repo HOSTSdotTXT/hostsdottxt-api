@@ -1,4 +1,4 @@
-FROM rust:1.62-bullseye AS builder
+FROM rust:1.66-bullseye AS builder
 WORKDIR /src/
 RUN cargo init --bin
 COPY Cargo.toml Cargo.lock ./
