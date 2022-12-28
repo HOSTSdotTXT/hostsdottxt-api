@@ -16,9 +16,7 @@ use whois_rust::{WhoIs, WhoIsLookupOptions};
 lazy_static! {
     static ref NAMESERVERS: Vec<String> = Vec::from([
         String::from("ns1.hostsdottxt.net."),
-        String::from("ns2.hostsdottxt.net."),
-        String::from("ns3.hostsdottxt.net."),
-        String::from("ns4.hostsdottxt.net.")
+        String::from("ns2.hostsdottxt.net.")
     ]);
 }
 

@@ -36,7 +36,12 @@ pub async fn get_records(
         );
     }
 
-    let records = db::records::get_records(&pool, &zone.id).await.unwrap();
+    let records: Vec<db::models::Record> = db::records::get_records(&pool, &zone.id)
+        .await
+        .unwrap()
+        .into_iter()
+        .filter(|r| r.record_type != "SOA" && r.record_type != "NS")
+        .collect();
 
     (StatusCode::OK, Json(json!(records)))
 }
